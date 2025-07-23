@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Interfaces\" />
+    <Folder Include="GameCatalog\Entities\" />
+    <Folder Include="GameCatalog\Events\" />
+    <Folder Include="GameCatalog\Interfaces\" />
+    <Folder Include="GameCatalog\Exceptions\" />
+    <Folder Include="GameCatalog\ValueObjects\" />
+    <Folder Include="GameLibrary\Entities\" />
+    <Folder Include="GameLibrary\Events\" />
+    <Folder Include="GameLibrary\Interfaces\" />
+    <Folder Include="GameLibrary\Exceptions\" />
+    <Folder Include="GameLibrary\ValueObjects\" />
+    <Folder Include="Promotion\Entities\" />
+    <Folder Include="Promotion\Events\" />
+    <Folder Include="Promotion\Interfaces\" />
+    <Folder Include="Promotion\Exceptions\" />
+    <Folder Include="Promotion\ValueObjects\" />
+    <Folder Include="UserManagement\Events\" />
+    <Folder Include="UserManagement\Exceptions\" />
+  </ItemGroup>
+
+</Project>
