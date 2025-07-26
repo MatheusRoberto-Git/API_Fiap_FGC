@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new()
@@ -48,6 +50,8 @@ builder.Services.AddScoped<AuthenticateUserUseCase>();
 builder.Services.AddScoped<GetUserProfileUseCase>();
 builder.Services.AddScoped<ChangePasswordUseCase>();
 builder.Services.AddScoped<DeactivateUserUseCase>();
+builder.Services.AddScoped<CreateAdminUserUseCase>();
+builder.Services.AddScoped<PromoteUserToAdminUseCase>();
 
 builder.Services.AddCors(options =>
 {
@@ -59,8 +63,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<FCGDbContext>();
+builder.Services.AddHealthChecks().AddDbContextCheck<FCGDbContext>();
 
 var app = builder.Build();
 
@@ -79,6 +82,7 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+
 app.MapGet("/", () => new
 {
     Application = "FIAP Cloud Games API",
@@ -90,7 +94,9 @@ app.MapGet("/", () => new
         Swagger = "/swagger",
         Health = "/health",
         Users = "/api/users",
-        Auth = "/api/auth"
+        Auth = "/api/auth",
+        Admin = "/api/admin",
+        DebugUsers = "/debug/users"
     }
 });
 

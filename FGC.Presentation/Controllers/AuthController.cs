@@ -11,12 +11,16 @@ namespace FGC.Presentation.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        #region [Contructor]
+
         private readonly AuthenticateUserUseCase _authenticateUserUseCase;
 
         public AuthController(AuthenticateUserUseCase authenticateUserUseCase)
         {
             _authenticateUserUseCase = authenticateUserUseCase;
         }
+
+        #endregion
 
         [HttpPost("Login")]
         public async Task<ActionResult<ApiResponse<AuthResponse>>> Login([FromBody] LoginRequest request)

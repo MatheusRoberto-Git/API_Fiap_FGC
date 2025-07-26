@@ -11,6 +11,8 @@ namespace FGC.Presentation.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
+        #region [Contructor]
+
         private readonly RegisterUserUseCase _registerUserUseCase;
         private readonly GetUserProfileUseCase _getUserProfileUseCase;
         private readonly ChangePasswordUseCase _changePasswordUseCase;
@@ -22,6 +24,38 @@ namespace FGC.Presentation.Controllers
             _getUserProfileUseCase = getUserProfileUseCase;
             _changePasswordUseCase = changePasswordUseCase;
             _deactivateUserUseCase = deactivateUserUseCase;
+        }
+
+        #endregion
+
+        [HttpGet("GetProfile/{id}")]
+        public async Task<ActionResult<ApiResponse<UserResponse>>> GetProfile(Guid id)
+        {
+            try
+            {
+                var dto = new GetUserProfileDTO { UserId = id };
+                var result = await _getUserProfileUseCase.ExecuteAsync(dto);
+
+                var response = new UserResponse
+                {
+                    Id = result.Id,
+                    Email = result.Email,
+                    Name = result.Name,
+                    Role = result.Role,
+                    CreatedAt = result.CreatedAt,
+                    IsActive = result.IsActive
+                };
+
+                return Ok(ApiResponse<UserResponse>.SuccessMethod(response));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<UserResponse>.ErrorMethod(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<UserResponse>.ErrorMethod($"Erro interno do servidor - {ex.Message}"));
+            }
         }
 
         [HttpPost("UserRegister")]
@@ -66,37 +100,7 @@ namespace FGC.Presentation.Controllers
             {
                 return StatusCode(500, ApiResponse<UserResponse>.ErrorMethod($"Erro interno do servidor - {ex.Message}"));
             }
-        }
-
-        [HttpGet("GetProfile/{id}")]
-        public async Task<ActionResult<ApiResponse<UserResponse>>> GetProfile(Guid id)
-        {
-            try
-            {
-                var dto = new GetUserProfileDTO { UserId = id };
-                var result = await _getUserProfileUseCase.ExecuteAsync(dto);
-
-                var response = new UserResponse
-                {
-                    Id = result.Id,
-                    Email = result.Email,
-                    Name = result.Name,
-                    Role = result.Role,
-                    CreatedAt = result.CreatedAt,
-                    IsActive = result.IsActive
-                };
-
-                return Ok(ApiResponse<UserResponse>.SuccessMethod(response));
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(ApiResponse<UserResponse>.ErrorMethod(ex.Message));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ApiResponse<UserResponse>.ErrorMethod($"Erro interno do servidor - {ex.Message}"));
-            }
-        }
+        }        
 
         [HttpPut("ChangePassword/{id}")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> ChangePassword(Guid id, [FromBody] ChangePasswordRequest request)
@@ -140,36 +144,6 @@ namespace FGC.Presentation.Controllers
             {
                 return StatusCode(500, ApiResponse<UserResponse>.ErrorMethod($"Erro interno do servidor - {ex.Message}"));
             }
-        }
-
-        [HttpDelete("DeactivateUser/{id}")]
-        public async Task<ActionResult<ApiResponse<UserResponse>>> DeactivateUser(Guid id)
-        {
-            try
-            {
-                var dto = new DeactivateUserDTO { UserId = id };
-                var result = await _deactivateUserUseCase.ExecuteAsync(dto);
-
-                var response = new UserResponse
-                {
-                    Id = result.Id,
-                    Email = result.Email,
-                    Name = result.Name,
-                    Role = result.Role,
-                    CreatedAt = result.CreatedAt,
-                    IsActive = result.IsActive
-                };
-
-                return Ok(ApiResponse<UserResponse>.SuccessMethod(response, "Usuário desativado com sucesso"));
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(ApiResponse<UserResponse>.ErrorMethod(ex.Message));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ApiResponse<UserResponse>.ErrorMethod($"Erro interno do servidor - {ex.Message}"));
-            }
-        }
+        }        
     }
 }

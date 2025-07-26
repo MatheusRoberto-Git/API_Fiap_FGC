@@ -51,16 +51,29 @@ namespace FGC.Domain.UserManagement.Entities
             return user;
         }
 
-        public static User CreateAdmin(Email email, Password password, string name)
+        public static User CreateAdmin(Email email, Password password, string name, Guid? createdByAdminId = null)
         {
             var user = new User(email, password, name, UserRole.Admin);
 
-            user.AddDomainEvent(new UserCreatedEvent(
-                user.Id,
-                user.Email.Value,
-                user.Name,
-                user.CreatedAt
-            ));
+            if (createdByAdminId.HasValue && createdByAdminId.Value != Guid.Empty)
+            {
+                user.AddDomainEvent(new AdminUserCreatedEvent(
+                    user.Id,
+                    user.Email.Value,
+                    user.Name,
+                    createdByAdminId.Value,
+                    user.CreatedAt
+                ));
+            }
+            else
+            {
+                user.AddDomainEvent(new UserCreatedEvent(
+                    user.Id,
+                    user.Email.Value,
+                    user.Name,
+                    user.CreatedAt
+                ));
+            }
 
             return user;
         }
@@ -125,7 +138,17 @@ namespace FGC.Domain.UserManagement.Entities
             if (Role == UserRole.Admin)
                 throw new InvalidOperationException("Usuário já é administrador");
 
+            if (!IsActive)
+                throw new InvalidOperationException("Usuário inativo não pode ser promovido");
+
             Role = UserRole.Admin;
+
+            AddDomainEvent(new UserPromotedToAdminEvent(
+                Id,
+                Email.Value,
+                Name,
+                DateTime.UtcNow
+            ));
         }
 
         public void DemoteToUser()
