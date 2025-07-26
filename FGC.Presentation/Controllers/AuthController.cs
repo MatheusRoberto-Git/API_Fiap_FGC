@@ -3,7 +3,6 @@ using FGC.Application.UserManagement.DTOs;
 using FGC.Application.UserManagement.UseCases;
 using FGC.Presentation.Models.Requests;
 using FGC.Presentation.Models.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FGC.Presentation.Controllers
@@ -19,7 +18,7 @@ namespace FGC.Presentation.Controllers
             _authenticateUserUseCase = authenticateUserUseCase;
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<ApiResponse<AuthResponse>>> Login([FromBody] LoginRequest request)
         {
             try
@@ -63,7 +62,7 @@ namespace FGC.Presentation.Controllers
             }
         }
 
-        [HttpPost("logout")]
+        [HttpPost("Logout")]
         public async Task<ActionResult<ApiResponse<object>>> Logout()
         {
             return Ok(ApiResponse<object>.SuccessMethod(null, "Logout realizado com sucesso"));

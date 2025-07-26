@@ -3,7 +3,6 @@ using FGC.Application.UserManagement.DTOs;
 using FGC.Application.UserManagement.UseCases;
 using FGC.Presentation.Models.Requests;
 using FGC.Presentation.Models.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FGC.Presentation.Controllers
@@ -25,7 +24,7 @@ namespace FGC.Presentation.Controllers
             _deactivateUserUseCase = deactivateUserUseCase;
         }
 
-        [HttpPost("register")]
+        [HttpPost("UserRegister")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> Register([FromBody] RegisterUserRequest request)
         {
             try
@@ -69,7 +68,7 @@ namespace FGC.Presentation.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetProfile/{id}")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> GetProfile(Guid id)
         {
             try
@@ -99,7 +98,7 @@ namespace FGC.Presentation.Controllers
             }
         }
 
-        [HttpPut("{id}/password")]
+        [HttpPut("ChangePassword/{id}")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> ChangePassword(Guid id, [FromBody] ChangePasswordRequest request)
         {
             try
@@ -143,7 +142,7 @@ namespace FGC.Presentation.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("DeactivateUser/{id}")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> DeactivateUser(Guid id)
         {
             try
