@@ -22,6 +22,7 @@ namespace FGC.Application.UserManagement.UseCases
                 throw new ArgumentNullException(nameof(dto));
 
             var creatorAdmin = await _userRepository.GetByIdAsync(dto.CreatedByAdminId);
+
             if (creatorAdmin == null)
                 throw new UnauthorizedAccessException("Administrador criador não encontrado");
 

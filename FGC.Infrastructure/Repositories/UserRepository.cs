@@ -1,7 +1,7 @@
-﻿using FCG.Infrastructure.Data.Context;
-using FGC.Domain.UserManagement.Entities;
+﻿using FGC.Domain.UserManagement.Entities;
 using FGC.Domain.UserManagement.Interfaces;
 using FGC.Domain.UserManagement.ValueObjects;
+using FGC.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace FGC.Infrastructure.Repositories
@@ -10,9 +10,9 @@ namespace FGC.Infrastructure.Repositories
     {
         #region [Constructor]
 
-        private readonly FCGDbContext _context;
+        private readonly FGCDbContext _context;
 
-        public UserRepository(FCGDbContext context)
+        public UserRepository(FGCDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

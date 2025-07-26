@@ -2,11 +2,11 @@
 using FGC.Infrastructure.Data.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace FCG.Infrastructure.Data.Context
+namespace FGC.Infrastructure.Data.Context
 {
-    public class FCGDbContext : DbContext
+    public class FGCDbContext : DbContext
     {
-        public FCGDbContext(DbContextOptions<FCGDbContext> options) : base(options) { }
+        public FGCDbContext(DbContextOptions<FGCDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
 

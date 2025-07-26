@@ -1,14 +1,16 @@
-﻿using FCG.Infrastructure.Data.Context;
-using FGC.Application.UserManagement.UseCases;
+﻿using FGC.Application.UserManagement.UseCases;
 using FGC.Domain.UserManagement.Interfaces;
+using FGC.Infrastructure.Data.Context;
 using FGC.Infrastructure.Repositories;
 using FGC.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -20,15 +22,88 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API para gerenciamento de usuários e jogos da plataforma FCG"
     });
 
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        c.IncludeXmlComments(xmlPath);
-    }
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Insira o token JWT no formato: Bearer {seu_token}"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
-builder.Services.AddDbContext<FCGDbContext>(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("Jwt");
+    var secretKey = jwtSettings["SecretKey"];
+
+    if (string.IsNullOrEmpty(secretKey))
+        throw new InvalidOperationException("JWT SecretKey não configurada");
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"[JWT] Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var email = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            Console.WriteLine($"[JWT] Token validated for user: {email}");
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            Console.WriteLine($"[JWT] Authentication challenged: {context.Error}");
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserPolicy", policy =>
+        policy.RequireAuthenticatedUser());
+
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireRole("Admin"));
+});
+
+builder.Services.AddDbContext<FGCDbContext>(options =>
 {
     if (builder.Environment.IsProduction())
     {
@@ -45,6 +120,8 @@ builder.Services.AddDbContext<FCGDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserUniquenessService, UserUniquenessService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 builder.Services.AddScoped<RegisterUserUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase>();
 builder.Services.AddScoped<GetUserProfileUseCase>();
@@ -63,7 +140,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddHealthChecks().AddDbContextCheck<FCGDbContext>();
+builder.Services.AddHealthChecks().AddDbContextCheck<FGCDbContext>();
 
 var app = builder.Build();
 
@@ -79,6 +156,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
@@ -103,7 +181,7 @@ app.MapGet("/", () => new
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<FCGDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<FGCDbContext>();
 
     try
     {
