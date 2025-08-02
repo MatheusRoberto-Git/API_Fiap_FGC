@@ -77,7 +77,7 @@ API_Fiap_FGC/
 
 ### 1. Clonar o Repositório
 ```bash
-git clone [URL_DO_REPOSITORIO]
+git clone [https://github.com/MatheusRoberto-Git/API_Fiap_FGC.git]
 cd API_Fiap_FGC
 ```
 
