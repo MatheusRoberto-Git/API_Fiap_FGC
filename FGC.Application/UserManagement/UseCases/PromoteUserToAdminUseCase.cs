@@ -1,22 +1,21 @@
 ﻿using FGC.Application.UserManagement.DTOs;
 using FGC.Domain.UserManagement.Entities;
 using FGC.Domain.UserManagement.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FGC.Application.UserManagement.UseCases
 {
     public class PromoteUserToAdminUseCase
     {
+        #region [Constructor]
+
         private readonly IUserRepository _userRepository;
 
         public PromoteUserToAdminUseCase(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
+
+        #endregion
 
         public async Task<UserResponseDTO> ExecuteAsync(PromoteUserToAdminDTO dto)
         {

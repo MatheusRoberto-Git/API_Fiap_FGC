@@ -5,8 +5,11 @@
         #region [Properties]
 
         public Guid Id { get; }
+
         public DateTime OccurredAt { get; }
+
         public Guid UserId { get; }
+
         public DateTime ChangedAt { get; }
 
         #endregion

@@ -7,12 +7,16 @@ namespace FGC.Application.UserManagement.UseCases
 {
     public class AuthenticateUserUseCase
     {
+        #region [Constructor]
+
         private readonly IUserRepository _userRepository;
 
         public AuthenticateUserUseCase(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
+
+        #endregion
 
         public async Task<AuthenticatedUserDTO> ExecuteAsync(LoginDTO dto)
         {

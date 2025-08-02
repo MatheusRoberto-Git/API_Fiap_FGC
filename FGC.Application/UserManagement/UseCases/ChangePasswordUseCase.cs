@@ -7,12 +7,16 @@ namespace FGC.Application.UserManagement.UseCases
 {
     public class ChangePasswordUseCase
     {
+        #region [Constructor]
+
         private readonly IUserRepository _userRepository;
 
         public ChangePasswordUseCase(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
+
+        #endregion
 
         public async Task<UserResponseDTO> ExecuteAsync(ChangePasswordDTO dto)
         {
@@ -41,7 +45,6 @@ namespace FGC.Application.UserManagement.UseCases
 
             return MapToResponseDto(user);
         }
-
 
         private async Task ProcessDomainEventsAsync(User user)
         {

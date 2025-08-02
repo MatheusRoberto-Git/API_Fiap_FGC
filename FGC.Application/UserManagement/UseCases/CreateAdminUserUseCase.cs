@@ -7,6 +7,8 @@ namespace FGC.Application.UserManagement.UseCases
 {
     public class CreateAdminUserUseCase
     {
+        #region [Constructor]
+
         private readonly IUserRepository _userRepository;
         private readonly IUserUniquenessService _uniquenessService;
 
@@ -15,6 +17,8 @@ namespace FGC.Application.UserManagement.UseCases
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _uniquenessService = uniquenessService ?? throw new ArgumentNullException(nameof(uniquenessService));
         }
+
+        #endregion
 
         public async Task<UserResponseDTO> ExecuteAsync(CreateAdminUserDTO dto)
         {

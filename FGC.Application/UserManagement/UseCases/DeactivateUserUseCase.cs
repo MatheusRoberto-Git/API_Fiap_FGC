@@ -6,12 +6,16 @@ namespace FGC.Application.UserManagement.UseCases
 {
     public class DeactivateUserUseCase
     {
+        #region [Constructor]
+
         private readonly IUserRepository _userRepository;
 
         public DeactivateUserUseCase(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
+
+        #endregion
 
         public async Task<UserResponseDTO> ExecuteAsync(DeactivateUserDTO dto)
         {

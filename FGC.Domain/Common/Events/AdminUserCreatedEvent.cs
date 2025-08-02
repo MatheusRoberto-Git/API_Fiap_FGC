@@ -5,16 +5,20 @@
         #region [Properties]
 
         public Guid Id { get; }
+
         public DateTime OccurredAt { get; }
+
         public Guid NewAdminId { get; }
+
         public string Email { get; }
+
         public string Name { get; }
+
         public Guid CreatedByAdminId { get; }
+
         public DateTime CreatedAt { get; }
 
         #endregion
-
-        #region [Constructor]
 
         public AdminUserCreatedEvent(Guid newAdminId, string email, string name, Guid createdByAdminId, DateTime createdAt)
         {
@@ -32,7 +36,5 @@
             CreatedByAdminId = createdByAdminId;
             CreatedAt = createdAt;
         }
-
-        #endregion
     }
 }

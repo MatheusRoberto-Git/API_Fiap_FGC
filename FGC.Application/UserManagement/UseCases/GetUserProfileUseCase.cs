@@ -6,12 +6,16 @@ namespace FGC.Application.UserManagement.UseCases
 {
     public class GetUserProfileUseCase
     {
+        #region [Constructor]
+
         private readonly IUserRepository _userRepository;
 
         public GetUserProfileUseCase(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
+
+        #endregion
 
         public async Task<UserResponseDTO> ExecuteAsync(GetUserProfileDTO dto)
         {

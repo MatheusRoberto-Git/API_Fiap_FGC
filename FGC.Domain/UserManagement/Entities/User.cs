@@ -10,11 +10,17 @@ namespace FGC.Domain.UserManagement.Entities
         #region [Properties]
 
         public Email Email { get; private set; }
+
         public Password Password { get; private set; }
+
         public string Name { get; private set; }
+
         public UserRole Role { get; private set; }
+
         public DateTime CreatedAt { get; private set; }
+
         public DateTime? LastLoginAt { get; private set; }
+
         public bool IsActive { get; private set; }
 
         #endregion

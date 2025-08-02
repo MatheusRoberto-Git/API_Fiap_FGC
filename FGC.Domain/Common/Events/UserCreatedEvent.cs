@@ -5,10 +5,15 @@
         #region [Properties]
 
         public Guid Id { get; }
+
         public DateTime OccurredAt { get; }
+
         public Guid UserId { get; }
+
         public string Email { get; }
+
         public string Name { get; }
+
         public DateTime CreatedAt { get; }
 
         #endregion

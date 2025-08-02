@@ -5,8 +5,11 @@ namespace FGC.Domain.Common.Entities
     public abstract class AggregateRoot : Entity
     {
         private readonly List<IDomainEvent> _domainEvents = new();
+
         protected AggregateRoot() : base() { }
+
         protected AggregateRoot(Guid id) : base(id) { }
+
         public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
         public void AddDomainEvent(IDomainEvent domainEvent)

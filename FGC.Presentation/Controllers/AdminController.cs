@@ -46,7 +46,7 @@ namespace FGC.Presentation.Controllers
                     Email = request.Email,
                     Password = request.Password,
                     Name = request.Name,
-                    CreatedByAdminId = currentAdminId.Value // ✅ Automático do JWT
+                    CreatedByAdminId = currentAdminId.Value
                 };
 
                 var result = await _createAdminUseCase.ExecuteAsync(dto);
