@@ -7,24 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Interfaces\" />
-    <Folder Include="GameCatalog\Entities\" />
-    <Folder Include="GameCatalog\Events\" />
-    <Folder Include="GameCatalog\Interfaces\" />
-    <Folder Include="GameCatalog\Exceptions\" />
-    <Folder Include="GameCatalog\ValueObjects\" />
-    <Folder Include="GameLibrary\Entities\" />
-    <Folder Include="GameLibrary\Events\" />
-    <Folder Include="GameLibrary\Interfaces\" />
-    <Folder Include="GameLibrary\Exceptions\" />
-    <Folder Include="GameLibrary\ValueObjects\" />
-    <Folder Include="Promotion\Entities\" />
-    <Folder Include="Promotion\Events\" />
-    <Folder Include="Promotion\Interfaces\" />
-    <Folder Include="Promotion\Exceptions\" />
-    <Folder Include="Promotion\ValueObjects\" />
-    <Folder Include="UserManagement\Events\" />
-    <Folder Include="UserManagement\Exceptions\" />
+    <Compile Remove="Common\Interfaces\**" />
+    <Compile Remove="GameLibrary\**" />
+    <Compile Remove="Promotion\**" />
+    <Compile Remove="UserManagement\Events\**" />
+    <Compile Remove="UserManagement\Exceptions\**" />
+    <EmbeddedResource Remove="Common\Interfaces\**" />
+    <EmbeddedResource Remove="GameLibrary\**" />
+    <EmbeddedResource Remove="Promotion\**" />
+    <EmbeddedResource Remove="UserManagement\Events\**" />
+    <EmbeddedResource Remove="UserManagement\Exceptions\**" />
+    <None Remove="Common\Interfaces\**" />
+    <None Remove="GameLibrary\**" />
+    <None Remove="Promotion\**" />
+    <None Remove="UserManagement\Events\**" />
+    <None Remove="UserManagement\Exceptions\**" />
   </ItemGroup>
 
 </Project>

@@ -8,6 +8,8 @@ namespace FGC.Infrastructure.Data.Context
     {
         public FGCDbContext(DbContextOptions<FGCDbContext> options) : base(options) { }
 
+        public FGCDbContext() : base() { }
+
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,7 +28,8 @@ namespace FGC.Infrastructure.Data.Context
                 {
                     if (property.ClrType == typeof(decimal) || property.ClrType == typeof(decimal?))
                     {
-                        property.SetColumnType("decimal(18,2)");
+                        property.SetPrecision(18);
+                        property.SetScale(2);
                     }
                 }
             }
