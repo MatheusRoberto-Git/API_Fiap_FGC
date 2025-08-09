@@ -17,14 +17,18 @@ namespace FGC.Presentation.Controllers
         #region [Contructor]
 
         private readonly PromoteUserToAdminUseCase _promoteUserUseCase;
+        private readonly DemoteAdminToUserUseCase _demoteAdminUseCase;
         private readonly CreateAdminUserUseCase _createAdminUseCase;
         private readonly DeactivateUserUseCase _deactivateUserUseCase;
+        private readonly ReactivateUserUseCase _reactivateUserUseCase;
 
-        public AdminController(PromoteUserToAdminUseCase promoteUserUseCase, CreateAdminUserUseCase createAdminUseCase, DeactivateUserUseCase deactivateUserUseCase)
+        public AdminController(PromoteUserToAdminUseCase promoteUserUseCase, DemoteAdminToUserUseCase demoteAdminUseCase, CreateAdminUserUseCase createAdminUseCase, DeactivateUserUseCase deactivateUserUseCase, ReactivateUserUseCase reactivateUserUseCase)
         {
             _promoteUserUseCase = promoteUserUseCase;
+            _demoteAdminUseCase = demoteAdminUseCase;
             _createAdminUseCase = createAdminUseCase;
             _deactivateUserUseCase = deactivateUserUseCase;
+            _reactivateUserUseCase = reactivateUserUseCase;
         }
 
         #endregion
@@ -114,6 +118,44 @@ namespace FGC.Presentation.Controllers
             }
         }
 
+        [HttpPut("demote/{adminId}")]
+        public async Task<ActionResult<ApiResponse<UserResponse>>> DemoteAdminToUser(Guid adminId)
+        {
+            try
+            {
+                if (adminId == Guid.Empty)
+                    return BadRequest(ApiResponse<object>.ErrorMethod("ID do administrador é obrigatório"));
+
+                var currentAdminId = GetCurrentUserId();
+                if (currentAdminId == null)
+                    return StatusCode(401, ApiResponse<object>.ErrorMethod("Token inválido"));
+
+                var dto = new DemoteAdminToUserDTO
+                {
+                    AdminId = adminId,
+                    RequestingAdminId = currentAdminId.Value
+                };
+
+                var result = await _demoteAdminUseCase.ExecuteAsync(dto);
+                var response = MapToUserResponse(result);
+
+                return Ok(ApiResponse<UserResponse>.SuccessMethod(response, $"Administrador '{result.Name}' despromovido para usuário comum"));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(401, ApiResponse<object>.ErrorMethod(ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                var statusCode = ex.Message.Contains("não encontrado") ? 404 : 409;
+                return StatusCode(statusCode, ApiResponse<object>.ErrorMethod(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.ErrorMethod($"Erro interno do servidor {ex.Message}"));
+            }
+        }
+
         [HttpPut("deactivate/{userId}")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> DeactivateUser(Guid userId)
         {
@@ -126,6 +168,30 @@ namespace FGC.Presentation.Controllers
                 var response = MapToUserResponse(result);
 
                 return Ok(ApiResponse<UserResponse>.SuccessMethod(response, $"Usuário '{result.Name}' desativado"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                var statusCode = ex.Message.Contains("não encontrado") ? 404 : 409;
+                return StatusCode(statusCode, ApiResponse<object>.ErrorMethod(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.ErrorMethod($"Erro interno do servidor {ex.Message}"));
+            }
+        }
+
+        [HttpPut("reactivate/{userId}")]
+        public async Task<ActionResult<ApiResponse<UserResponse>>> ReactivateUser(Guid userId)
+        {
+            try
+            {
+                if (userId == Guid.Empty)
+                    return BadRequest(ApiResponse<object>.ErrorMethod("ID do usuário é obrigatório"));
+
+                var result = await _reactivateUserUseCase.ExecuteAsync(new ReactivateUserDTO { UserId = userId });
+                var response = MapToUserResponse(result);
+
+                return Ok(ApiResponse<UserResponse>.SuccessMethod(response, $"Usuário '{result.Name}' reativado com sucesso"));
             }
             catch (InvalidOperationException ex)
             {

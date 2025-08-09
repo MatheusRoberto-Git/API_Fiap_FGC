@@ -105,17 +105,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddDbContext<FGCDbContext>(options =>
 {
-    if (builder.Environment.IsProduction())
-    {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    }
-    else
-    {
-        options.UseInMemoryDatabase("FCGDevelopmentDb");
-    }
-
-    options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
-    options.LogTo(Console.WriteLine, LogLevel.Information);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -127,8 +117,11 @@ builder.Services.AddScoped<AuthenticateUserUseCase>();
 builder.Services.AddScoped<GetUserProfileUseCase>();
 builder.Services.AddScoped<ChangePasswordUseCase>();
 builder.Services.AddScoped<DeactivateUserUseCase>();
+builder.Services.AddScoped<ReactivateUserUseCase>();
 builder.Services.AddScoped<CreateAdminUserUseCase>();
 builder.Services.AddScoped<PromoteUserToAdminUseCase>();
+builder.Services.AddScoped<DemoteAdminToUserUseCase>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -144,7 +137,7 @@ builder.Services.AddHealthChecks().AddDbContextCheck<FGCDbContext>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
