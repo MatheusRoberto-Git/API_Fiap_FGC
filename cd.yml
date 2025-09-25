@@ -8,7 +8,7 @@ name: CD - Deploy to Azure
 # Trigger: apenas na branch main
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch: # Permite execução manual
 
 # Variáveis globais
@@ -17,7 +17,7 @@ env:
   AZURE_WEBAPP_NAME: 'fgc-api'    # Nome do App Service
   AZURE_WEBAPP_PACKAGE_PATH: './publish'
   DOCKER_IMAGE_NAME: 'fgc-api'
-  DOCKER_REGISTRY: 'docker.io'         # Docker Hub
+  DOCKER_REGISTRY: 'docker.io'    # Docker Hub
 
 jobs:
   # ===== JOB 1: BUILD & PUBLISH =====

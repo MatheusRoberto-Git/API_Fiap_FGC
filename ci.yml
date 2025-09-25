@@ -8,9 +8,9 @@ name: CI - Tests & Quality
 # Triggers: quando executar
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master ]
 
 # Variáveis globais
 env:
