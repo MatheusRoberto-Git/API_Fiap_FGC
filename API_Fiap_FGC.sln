@@ -21,35 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{E217D2EC-56EC-44DE-82A0-DF300AF8E2C5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{7B9E483B-E2EB-4F69-A2F9-3E0D844AD49D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{FA1EDBF1-329A-4857-A319-AFA7344E9A35}"
-	ProjectSection(SolutionItems) = preProject
-		cd.yml = cd.yml
-		ci.yml = ci.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Monitoring", "Monitoring", "{4FA6412A-67C9-4493-AA58-5051927FEFA7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prometheus", "Prometheus", "{E84EB150-A442-42FA-B69E-01ECC4DCC2F1}"
-	ProjectSection(SolutionItems) = preProject
-		prometheus.yml = prometheus.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Grafana", "Grafana", "{E4F0C98F-DCF3-4829-9E41-4F2B867BBE22}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Provisioning", "Provisioning", "{0010B68B-4F00-43CB-8057-4C61C5B71AA9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dashboards", "Dashboards", "{C8F58E53-5B0C-40BA-8F25-1D7CB3D08894}"
-	ProjectSection(SolutionItems) = preProject
-		fgc-dashboard.json = fgc-dashboard.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Datasources", "Datasources", "{AD4F65AE-0013-4AF5-824F-AA51B99DB7F4}"
-	ProjectSection(SolutionItems) = preProject
-		prometheusToGrafana.yml = prometheusToGrafana.yml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,12 +57,6 @@ Global
 		{F30504F5-13BB-4DD2-9CBC-D83DA67C5E52} = {3794BDF6-7A28-4FE2-BB2A-8BC07CDDB889}
 		{08EC7040-63F9-4449-9903-BDD3BCEFE036} = {E217D2EC-56EC-44DE-82A0-DF300AF8E2C5}
 		{49E3BE61-5DD1-43E2-9CFB-5272E3BC56F3} = {4A17FD0E-7E16-4D16-9ABF-F9474634B8CA}
-		{FA1EDBF1-329A-4857-A319-AFA7344E9A35} = {7B9E483B-E2EB-4F69-A2F9-3E0D844AD49D}
-		{E84EB150-A442-42FA-B69E-01ECC4DCC2F1} = {4FA6412A-67C9-4493-AA58-5051927FEFA7}
-		{E4F0C98F-DCF3-4829-9E41-4F2B867BBE22} = {4FA6412A-67C9-4493-AA58-5051927FEFA7}
-		{0010B68B-4F00-43CB-8057-4C61C5B71AA9} = {E4F0C98F-DCF3-4829-9E41-4F2B867BBE22}
-		{C8F58E53-5B0C-40BA-8F25-1D7CB3D08894} = {E4F0C98F-DCF3-4829-9E41-4F2B867BBE22}
-		{AD4F65AE-0013-4AF5-824F-AA51B99DB7F4} = {0010B68B-4F00-43CB-8057-4C61C5B71AA9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0E558805-0AF7-4DD6-9B75-A607F9F5E887}
