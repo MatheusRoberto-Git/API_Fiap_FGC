@@ -10,6 +10,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region [Services - Controllers & Swagger]
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -47,6 +49,10 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+#endregion
+
+#region [Services - Authentication & Authorization]
 
 builder.Services.AddAuthentication(options =>
 {
@@ -103,6 +109,10 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin"));
 });
 
+#endregion
+
+#region [Services - Database & Repositories]
+
 builder.Services.AddDbContext<FGCDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -111,6 +121,10 @@ builder.Services.AddDbContext<FGCDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserUniquenessService, UserUniquenessService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+
+#endregion
+
+#region [Services - Use Cases]
 
 builder.Services.AddScoped<RegisterUserUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase>();
@@ -122,6 +136,9 @@ builder.Services.AddScoped<CreateAdminUserUseCase>();
 builder.Services.AddScoped<PromoteUserToAdminUseCase>();
 builder.Services.AddScoped<DemoteAdminToUserUseCase>();
 
+#endregion
+
+#region [Services - CORS & HealthChecks]
 
 builder.Services.AddCors(options =>
 {
@@ -135,7 +152,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddHealthChecks().AddDbContextCheck<FGCDbContext>();
 
+#endregion
+
 var app = builder.Build();
+
+#region [Middleware - Swagger]
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
@@ -147,10 +168,15 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     });
 }
 
+#endregion
+
+#region [Middleware - Pipeline]
+
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.MapHealthChecks("/health");
 
@@ -171,6 +197,10 @@ app.MapGet("/", () => new
     }
 });
 
+#endregion
+
+#region [Database Initialization (Development only)]
+
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -187,8 +217,14 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+#endregion
+
+#region [Logs Startup Info]
+
 Console.WriteLine("FIAP Cloud Games API iniciada!");
 Console.WriteLine($"Ambiente: {app.Environment.EnvironmentName}");
 Console.WriteLine($"Swagger: {(app.Environment.IsDevelopment() ? "Habilitado" : "Desabilitado")}");
+
+#endregion
 
 app.Run();
