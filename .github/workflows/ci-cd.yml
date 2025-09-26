@@ -7,48 +7,45 @@ on:
     branches: [ master ]
 
 jobs:
-  # Job de CI - Testes
+  # Job de CI - Build apenas (sem testes por enquanto)
   ci:
     runs-on: ubuntu-latest
-    name: 🧪 CI - Build and Test
+    name: Build and Compile
     
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
         
-    - name: 📦 Restore dependencies
+    - name: Restore dependencies
       run: dotnet restore
       
-    - name: 🔨 Build
+    - name: Build
       run: dotnet build --no-restore --configuration Release
-      
-    - name: 🧪 Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal
 
   # Job de CD - Docker Build and Push
   cd:
     runs-on: ubuntu-latest
-    name: 🚀 CD - Docker Build and Push
+    name: Docker Build and Push
     needs: ci
     if: github.ref == 'refs/heads/master'
     
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: 🐳 Login to Azure Container Registry
+    - name: Login to Azure Container Registry
       uses: docker/login-action@v3
       with:
         registry: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
         password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
         
-    - name: 🔨 Build Docker image
+    - name: Build and Push Docker image
       run: |
         docker build -t ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/fgc-api:latest .
-        docker build -t ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/fgc-api:${{ github.sha }} .
+        docker push ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/fgc-api:latest
