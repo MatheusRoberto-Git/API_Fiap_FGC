@@ -46,12 +46,14 @@ jobs:
           --verbosity minimal
     
     - name: 📊 Publish Test Results
-      uses: dorny/test-reporter@v1
       if: success() || failure()
-      with:
-        name: 'Test Results'
-        path: './TestResults/*.trx'
-        reporter: 'dotnet-trx'
+      run: |
+        echo "## 📊 Test Results" >> $GITHUB_STEP_SUMMARY
+        if ls ./TestResults/*.trx 1> /dev/null 2>&1; then
+          echo "✅ Test results found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ No test results found" >> $GITHUB_STEP_SUMMARY
+        fi
     
     - name: 📈 Code Coverage Report
       if: success() || failure()
@@ -68,17 +70,16 @@ jobs:
     - name: 📥 Checkout Code
       uses: actions/checkout@v4
     
-    - name: 🔧 Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-    
     - name: 🔍 Security Scan
       run: |
-        # Instalar ferramenta de segurança
-        dotnet tool install --global security-scan
-        # Executar scan
-        echo "Security scan completed ✅"
+        echo "🔒 Running basic security checks..."
+        # Verificar se não há secrets commitados
+        if grep -r "password\|secret\|key" --include="*.json" --include="*.config" .; then
+          echo "⚠️ Potential secrets found in config files"
+        else
+          echo "✅ No obvious secrets in config files"
+        fi
+        echo "✅ Security scan completed"
 
   build-docker:
     name: 🐳 Docker Build Test

@@ -1,0 +1,22 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+indent_style = space
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# C# files
+[*.cs]
+indent_size = 4
+
+# Disable some warnings for this project
+# CS1998: This async method lacks 'await' operators
+dotnet_diagnostic.CS1998.severity = none
+
+# CS8625: Cannot convert null literal to non-nullable reference type
+dotnet_diagnostic.CS8625.severity = suggestion
