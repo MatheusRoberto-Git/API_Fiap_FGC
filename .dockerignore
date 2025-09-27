@@ -1,0 +1,40 @@
+# Pastas de build e output
+**/bin/
+**/obj/
+**/out/
+
+# Arquivos do Visual Studio
+**/.vs/
+**/.vscode/
+*.user
+*.suo
+*.cache
+
+# Arquivos de teste
+**/TestResults/
+**/*.trx
+
+# Node.js
+**/node_modules/
+**/npm-debug.log
+
+# Docker
+**/Dockerfile*
+**/.dockerignore
+
+# Git
+**/.git/
+**/.gitignore
+**/.gitattributes
+
+# Documentação e arquivos README
+**/README*.md
+**/CHANGELOG*.md
+
+# Arquivos de configuração local
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Logs
+**/logs/
+**/*.log
