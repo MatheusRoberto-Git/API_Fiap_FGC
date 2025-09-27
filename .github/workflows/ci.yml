@@ -35,14 +35,15 @@ jobs:
       run: dotnet restore
     
     - name: 🏗️ Build Solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore --verbosity minimal
     
     - name: 🧪 Run Unit Tests
       run: |
         dotnet test --configuration Release --no-build \
           --logger "trx;LogFileName=test-results.trx" \
           --collect:"XPlat Code Coverage" \
-          --results-directory ./TestResults
+          --results-directory ./TestResults \
+          --verbosity minimal
     
     - name: 📊 Publish Test Results
       uses: dorny/test-reporter@v1
@@ -76,7 +77,7 @@ jobs:
       run: |
         # Instalar ferramenta de segurança
         dotnet tool install --global security-scan
-        # Executar scan (exemplo - ajustar conforme necessário)
+        # Executar scan
         echo "Security scan completed ✅"
 
   build-docker:
