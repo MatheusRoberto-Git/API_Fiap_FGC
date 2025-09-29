@@ -90,7 +90,11 @@ jobs:
             Jwt__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
             Jwt__Issuer=FGC.API \
             Jwt__Audience=FGC.Client \
-            Jwt__ExpireMinutes=120
+            Jwt__ExpireMinutes=120 \
+            DD_API_KEY="${{ secrets.DATADOG_API_KEY }}" \
+            DD_SITE=datadoghq.com \
+            DD_ENV=production \
+            DD_SERVICE=fgc-api
     
     - name: 📊 Get Deployment Info
       id: deployment-info
