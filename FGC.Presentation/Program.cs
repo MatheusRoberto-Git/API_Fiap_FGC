@@ -1,4 +1,4 @@
-﻿using FGC.Application.UserManagement.UseCases;
+using FGC.Application.UserManagement.UseCases;
 using FGC.Domain.UserManagement.Interfaces;
 using FGC.Infrastructure.Data.Context;
 using FGC.Infrastructure.Repositories;
@@ -172,7 +172,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 #region [Middleware - Pipeline]
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
