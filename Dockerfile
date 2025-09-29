@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Copiar arquivos de projeto e restaurar dependências
+# Copiar arquivos de projeto e restaurar dependÃªncias
 COPY ["FGC.Presentation/FGC.Presentation.csproj", "FGC.Presentation/"]
 COPY ["FGC.Application/FGC.Application.csproj", "FGC.Application/"]
 COPY ["FGC.Infrastructure/FGC.Infrastructure.csproj", "FGC.Infrastructure/"]
@@ -17,14 +17,14 @@ COPY ["FGC.Domain/FGC.Domain.csproj", "FGC.Domain/"]
 
 RUN dotnet restore "./FGC.Presentation/FGC.Presentation.csproj"
 
-# Copiar todo o código fonte
+# Copiar todo o cÃ³digo fonte
 COPY . .
 
-# Build da aplicação
+# Build da aplicaÃ§Ã£o
 WORKDIR "/src/FGC.Presentation"
 RUN dotnet build "./FGC.Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Publicar a aplicação
+# Publicar a aplicaÃ§Ã£o
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./FGC.Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
@@ -32,9 +32,26 @@ RUN dotnet publish "./FGC.Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/p
 # Imagem final
 FROM base AS final
 WORKDIR /app
+
+# Instalar curl e Datadog tracer
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v2.53.2/datadog-dotnet-apm_2.53.2_amd64.deb && \
+    dpkg -i ./datadog-dotnet-apm_2.53.2_amd64.deb && \
+    rm ./datadog-dotnet-apm_2.53.2_amd64.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copiar arquivos publicados
 COPY --from=publish /app/publish .
 
-# Variáveis de ambiente para produção
+# Configurar Datadog APM
+ENV CORECLR_ENABLE_PROFILING=1
+ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
+ENV DD_DOTNET_TRACER_HOME=/opt/datadog
+
+# VariÃ¡veis de ambiente para produÃ§Ã£o
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
 
