@@ -1,4 +1,4 @@
-﻿name: CD - Continuous Deployment
+name: CD - Continuous Deployment
 
 on:
   push:
@@ -70,30 +70,26 @@ jobs:
     
     - name: 🚀 Deploy to Azure Container Instance
       run: |
-        # Remover container anterior se existir
-        az container delete \
-          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --name fgc-api-container \
-          --yes || true
-        
-        # Criar novo container
         az container create \
           --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
           --name fgc-api-container \
-          --image ${{ steps.meta.outputs.FULL_IMAGE_NAME }}:${{ steps.meta.outputs.LATEST_TAG }} \
+          --image ${{ steps.meta.outputs.FULL_IMAGE_NAME }}:latest \
           --registry-login-server ${{ env.REGISTRY_NAME }}.azurecr.io \
           --registry-username ${{ secrets.ACR_USERNAME }} \
           --registry-password ${{ secrets.ACR_PASSWORD }} \
-          --dns-name-label fgc-api-$(date +%s) \
+          --dns-name-label fgc-api-v1 \
+          --os-type Linux \
           --ports 8080 \
           --cpu 1 \
           --memory 2 \
+          --restart-policy Always \
           --environment-variables \
             ASPNETCORE_ENVIRONMENT=Production \
+            ASPNETCORE_URLS=http://+:8080 \
             ConnectionStrings__DefaultConnection="${{ secrets.CONNECTION_STRING }}" \
             Jwt__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
-            Jwt__Issuer="FGC.API" \
-            Jwt__Audience="FGC.Client" \
+            Jwt__Issuer=FGC.API \
+            Jwt__Audience=FGC.Client \
             Jwt__ExpireMinutes=120
     
     - name: 📊 Get Deployment Info
