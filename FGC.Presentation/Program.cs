@@ -205,11 +205,9 @@ app.MapGet("/", () => new
 
 #region [Database Initialization (Development only)]
 
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<FGCDbContext>();
-
     try
     {
         await context.Database.EnsureCreatedAsync();
