@@ -238,20 +238,26 @@ app.MapGet("/", () => new
 
 #endregion
 
-#region [Database Initialization]
+#region [Database Initialization - Auto Migration]
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<FGCDbContext>();
     try
     {
-        await context.Database.EnsureCreatedAsync();
-        Console.WriteLine("✅ Banco de dados inicializado com sucesso");
+        Console.WriteLine("═══════════════════════════════════════════════════════");
+        Console.WriteLine("🔄 Verificando e aplicando migrations...");
+
+        // Aplica migrations pendentes automaticamente
+        await context.Database.MigrateAsync();
+
+        Console.WriteLine("✅ Banco de dados atualizado com sucesso");
         Console.WriteLine("📦 Tabelas: Users, Games, Payments");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Erro ao inicializar banco: {ex.Message}");
+        Console.WriteLine($"❌ Erro ao aplicar migrations: {ex.Message}");
+        // Não falha a aplicação, apenas loga o erro
     }
 }
 
@@ -263,7 +269,7 @@ Console.WriteLine("════════════════════�
 Console.WriteLine("🎮 FIAP Cloud Games API - Fase 3 (Microsserviços)");
 Console.WriteLine("═══════════════════════════════════════════════════════");
 Console.WriteLine($"📍 Ambiente: {app.Environment.EnvironmentName}");
-Console.WriteLine($"📖 Swagger: {(app.Environment.IsDevelopment() || app.Environment.IsProduction() ? "Habilitado" : "Desabilitado")}");
+Console.WriteLine($"📖 Swagger: Habilitado");
 Console.WriteLine("───────────────────────────────────────────────────────");
 Console.WriteLine("🔹 Microsserviço: Users     → /api/users, /api/auth, /api/admin");
 Console.WriteLine("🔹 Microsserviço: Games     → /api/games");
