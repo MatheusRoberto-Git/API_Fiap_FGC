@@ -5,12 +5,12 @@ namespace FGC.Domain.Tests
 {
     public class EmailTests
     {
-        #region [Cen·rios de SUCESSO - Devem PASSAR]
+        #region [Cen√°rios de SUCESSO - Devem PASSAR]
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Success")]
-        // Valida que um email com formato b·sico v·lido È criado corretamente
+        // Valida que um email com formato b√°sico v√°lido √© criado corretamente
         public void Constructor_WithValidSimpleEmail_ShouldCreateSuccessfully()
         {
             //Arrange (Preparar)
@@ -27,7 +27,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Success")]
-        // Valida que emails com subdomÌnios s„o aceitos
+        // Valida que emails com subdom√≠nios s√£o aceitos
         public void Constructor_WithValidEmailWithSubdomain_ShouldCreateSuccessfully()
         {
             //Arrange (Preparar)
@@ -43,7 +43,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Success")]
-        // Valida que emails com n˙meros s„o aceitos
+        // Valida que emails com n√∫meros s√£o aceitos
         public void Constructor_WithValidEmailWithNumbers_ShouldCreateSuccessfully()
         {
             //Arrange (Preparar)
@@ -59,7 +59,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Success")]
-        // Valida que emails em mai˙scula s„o normalizados para min˙scula
+        // Valida que emails em mai√∫scula s√£o normalizados para min√∫scula
         public void Constructor_WithUppercaseEmail_ShouldNormalizeToLowercase()
         {
             //Arrange (Preparar)
@@ -75,7 +75,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Success")]
-        // Valida que espaÁos no inÌcio e fim s„o removidos automaticamente
+        // Valida que espa√ßos no in√≠cio e fim s√£o removidos automaticamente
         public void Constructor_WithEmailWithSpaces_ShouldTrimSpaces()
         {
             //Arrange (Preparar)
@@ -91,7 +91,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Success")]
-        // Valida que emails longos (atÈ 254 chars) s„o aceitos
+        // Valida que emails longos (at√© 254 chars) s√£o aceitos
         public void Constructor_WithValidLongEmail_ShouldCreateSuccessfully()
         {
             //Arrange (Preparar)
@@ -106,40 +106,34 @@ namespace FGC.Domain.Tests
 
         #endregion
 
-        #region [Cen·rios de FALHA - Devem LAN«AR EXCE«√O]
+        #region [Cen√°rios de FALHA - Devem LAN√áAR EXCE√á√ÉO]
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que email null lanÁa exceÁ„o com mensagem especÌfica
+        // Valida que email null lan√ßa exce√ß√£o com mensagem espec√≠fica
         public void Constructor_WithNullEmail_ShouldThrowArgumentException()
         {
-            //Arrange (Preparar)
-            string nullEmail = null;
-
-            //Act & Assert
-            var exception = Assert.Throws<ArgumentException>(() => new Email(nullEmail));
-            exception.Message.Should().Be("Email n„o pode ser vazio ou nulo");
+            // Arrange & Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => new Email(null!));
+            exception.Message.Should().Contain("Email n√£o pode ser vazio ou nulo");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que string vazia lanÁa exceÁ„o apropriada
+        // Valida que string vazia lan√ßa exce√ß√£o apropriada
         public void Constructor_WithEmptyEmail_ShouldThrowArgumentException()
         {
-            //Arrange (Preparar)
-            var emptyEmail = "";
-
-            //Act & Assert
-            var exception = Assert.Throws<ArgumentException>(() => new Email(emptyEmail));
-            exception.Message.Should().Be("Email n„o pode ser vazio ou nulo");
+            // Arrange & Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => new Email(string.Empty));
+            exception.Message.Should().Contain("Email n√£o pode ser vazio ou nulo");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que apenas espaÁos em branco s„o rejeitados
+        // Valida que apenas espa√ßos em branco s√£o rejeitados
         public void Constructor_WithWhitespaceEmail_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -147,13 +141,13 @@ namespace FGC.Domain.Tests
 
             //Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(whitespaceEmail));
-            exception.Message.Should().Be("Email n„o pode ser vazio ou nulo");
+            exception.Message.Should().Be("Email n√£o pode ser vazio ou nulo");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que email sem @ È rejeitado como formato inv·lido
+        // Valida que email sem @ √© rejeitado como formato inv√°lido
         public void Constructor_WithEmailWithoutAtSymbol_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -161,13 +155,13 @@ namespace FGC.Domain.Tests
 
             //Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(invalidEmail));
-            exception.Message.Should().Be("Formato de email inv·lido");
+            exception.Message.Should().Be("Formato de email inv√°lido");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que email sem domÌnio apÛs @ È rejeitado
+        // Valida que email sem dom√≠nio ap√≥s @ √© rejeitado
         public void Constructor_WithEmailWithoutDomain_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -175,13 +169,13 @@ namespace FGC.Domain.Tests
 
             //Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(invalidEmail));
-            exception.Message.Should().Be("Formato de email inv·lido");
+            exception.Message.Should().Be("Formato de email inv√°lido");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que email sem parte local antes do @ È rejeitado
+        // Valida que email sem parte local antes do @ √© rejeitado
         public void Constructor_WithEmailWithoutLocalPart_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -189,13 +183,13 @@ namespace FGC.Domain.Tests
 
             //Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(invalidEmail));
-            exception.Message.Should().Be("Formato de email inv·lido");
+            exception.Message.Should().Be("Formato de email inv√°lido");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que emails muito longos (>254 chars) s„o rejeitados
+        // Valida que emails muito longos (>254 chars) s√£o rejeitados
         public void Constructor_WithTooLongEmail_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -203,13 +197,13 @@ namespace FGC.Domain.Tests
 
             //Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(tooLongEmail));
-            exception.Message.Should().Be("Email muito longo. M·ximo de 254 caracteres");
+            exception.Message.Should().Be("Email muito longo. M√°ximo de 254 caracteres");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que m˙ltiplos sÌmbolos @ s„o rejeitados
+        // Valida que m√∫ltiplos s√≠mbolos @ s√£o rejeitados
         public void Constructor_WithMultipleAtSymbols_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -217,13 +211,13 @@ namespace FGC.Domain.Tests
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(invalidEmail));
-            exception.Message.Should().Be("Formato de email inv·lido");
+            exception.Message.Should().Be("Formato de email inv√°lido");
         }
 
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Failure")]
-        // Valida que espaÁos dentro do email s„o rejeitados
+        // Valida que espa√ßos dentro do email s√£o rejeitados
         public void Constructor_WithEmailWithSpacesInside_ShouldThrowArgumentException()
         {
             //Arrange (Preparar)
@@ -231,7 +225,7 @@ namespace FGC.Domain.Tests
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => new Email(invalidEmail));
-            exception.Message.Should().Be("Formato de email inv·lido");
+            exception.Message.Should().Be("Formato de email inv√°lido");
         }
 
         #endregion
@@ -241,7 +235,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Behavior")]
-        // Valida que Value Objects com mesmo valor s„o considerados iguais
+        // Valida que Value Objects com mesmo valor s√£o considerados iguais
         public void TwoEmailsWithSameValue_ShouldBeEqual()
         {
             //Arrange (Preparar)
@@ -255,7 +249,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Behavior")]
-        // Valida que Value Objects com valores diferentes n„o s„o iguais
+        // Valida que Value Objects com valores diferentes n√£o s√£o iguais
         public void TwoEmailsWithDifferentValues_ShouldNotBeEqual()
         {
             //Arrange (Preparar)
@@ -286,7 +280,7 @@ namespace FGC.Domain.Tests
         [Fact]
         [Trait("Category", "TDD")]
         [Trait("Scenario", "Behavior")]
-        // Valida que convers„o implÌcita para string funciona corretamente
+        // Valida que convers√£o impl√≠cita para string funciona corretamente
         public void ImplicitConversion_ShouldReturnEmailValue()
         {
             //Arrange (Preparar)

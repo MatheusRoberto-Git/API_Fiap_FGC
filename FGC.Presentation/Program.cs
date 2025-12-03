@@ -1,4 +1,8 @@
-﻿using FGC.Application.UserManagement.UseCases;
+using FGC.Application.GameManagement.UseCases;
+using FGC.Application.PaymentManagement.UseCases;
+using FGC.Application.UserManagement.UseCases;
+using FGC.Domain.GameManagement.Interfaces;
+using FGC.Domain.PaymentManagement.Interfaces;
 using FGC.Domain.UserManagement.Interfaces;
 using FGC.Infrastructure.Data.Context;
 using FGC.Infrastructure.Repositories;
@@ -20,8 +24,8 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new()
     {
         Title = "FIAP Cloud Games API",
-        Version = "v1",
-        Description = "API para gerenciamento de usuários e jogos da plataforma FCG"
+        Version = "v3",
+        Description = "API para gerenciamento de usuários, jogos e pagamentos da plataforma FCG - Fase 3 (Microsserviços)"
     });
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -118,14 +122,22 @@ builder.Services.AddDbContext<FGCDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// User Management
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserUniquenessService, UserUniquenessService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+
+// Game Management
+builder.Services.AddScoped<IGameRepository, GameRepository>();
+
+// Payment Management
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 #endregion
 
 #region [Services - Use Cases]
 
+// User Use Cases
 builder.Services.AddScoped<RegisterUserUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase>();
 builder.Services.AddScoped<GetUserProfileUseCase>();
@@ -135,6 +147,21 @@ builder.Services.AddScoped<ReactivateUserUseCase>();
 builder.Services.AddScoped<CreateAdminUserUseCase>();
 builder.Services.AddScoped<PromoteUserToAdminUseCase>();
 builder.Services.AddScoped<DemoteAdminToUserUseCase>();
+
+// Game Use Cases
+builder.Services.AddScoped<CreateGameUseCase>();
+builder.Services.AddScoped<GetGameByIdUseCase>();
+builder.Services.AddScoped<GetAllGamesUseCase>();
+builder.Services.AddScoped<SearchGamesUseCase>();
+builder.Services.AddScoped<UpdateGamePriceUseCase>();
+
+// Payment Use Cases
+builder.Services.AddScoped<CreatePaymentUseCase>();
+builder.Services.AddScoped<ProcessPaymentUseCase>();
+builder.Services.AddScoped<GetPaymentStatusUseCase>();
+builder.Services.AddScoped<GetPaymentByIdUseCase>();
+builder.Services.AddScoped<GetUserPaymentsUseCase>();
+builder.Services.AddScoped<RefundPaymentUseCase>();
 
 #endregion
 
@@ -163,7 +190,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "FCG API v1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "FCG API v3 - Microsserviços");
         c.RoutePrefix = string.Empty;
     });
 }
@@ -172,7 +199,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 #region [Middleware - Pipeline]
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -183,9 +214,16 @@ app.MapHealthChecks("/health");
 app.MapGet("/", () => new
 {
     Application = "FIAP Cloud Games API",
-    Version = "1.0.0",
+    Version = "3.0.0",
+    Phase = "Fase 3 - Microsserviços",
     Environment = app.Environment.EnvironmentName,
     Timestamp = DateTime.UtcNow,
+    Microservices = new
+    {
+        Users = new { Status = "Active", Endpoints = "/api/users, /api/auth, /api/admin" },
+        Games = new { Status = "Active", Endpoints = "/api/games" },
+        Payments = new { Status = "Active", Endpoints = "/api/payments" }
+    },
     Endpoints = new
     {
         Swagger = "/swagger",
@@ -193,27 +231,33 @@ app.MapGet("/", () => new
         Users = "/api/users",
         Auth = "/api/auth",
         Admin = "/api/admin",
-        DebugUsers = "/debug/users"
+        Games = "/api/games",
+        Payments = "/api/payments"
     }
 });
 
 #endregion
 
-#region [Database Initialization (Development only)]
+#region [Database Initialization - Auto Migration]
 
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<FGCDbContext>();
-
     try
     {
-        await context.Database.EnsureCreatedAsync();
-        Console.WriteLine("Banco de dados inicializado com sucesso");
+        Console.WriteLine("═══════════════════════════════════════════════════════");
+        Console.WriteLine("🔄 Verificando e aplicando migrations...");
+
+        // Aplica migrations pendentes automaticamente
+        await context.Database.MigrateAsync();
+
+        Console.WriteLine("✅ Banco de dados atualizado com sucesso");
+        Console.WriteLine("📦 Tabelas: Users, Games, Payments");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Erro ao inicializar banco: {ex.Message}");
+        Console.WriteLine($"❌ Erro ao aplicar migrations: {ex.Message}");
+        // Não falha a aplicação, apenas loga o erro
     }
 }
 
@@ -221,9 +265,16 @@ if (app.Environment.IsDevelopment())
 
 #region [Logs Startup Info]
 
-Console.WriteLine("FIAP Cloud Games API iniciada!");
-Console.WriteLine($"Ambiente: {app.Environment.EnvironmentName}");
-Console.WriteLine($"Swagger: {(app.Environment.IsDevelopment() ? "Habilitado" : "Desabilitado")}");
+Console.WriteLine("═══════════════════════════════════════════════════════");
+Console.WriteLine("🎮 FIAP Cloud Games API - Fase 3 (Microsserviços)");
+Console.WriteLine("═══════════════════════════════════════════════════════");
+Console.WriteLine($"📍 Ambiente: {app.Environment.EnvironmentName}");
+Console.WriteLine($"📖 Swagger: Habilitado");
+Console.WriteLine("───────────────────────────────────────────────────────");
+Console.WriteLine("🔹 Microsserviço: Users     → /api/users, /api/auth, /api/admin");
+Console.WriteLine("🔹 Microsserviço: Games     → /api/games");
+Console.WriteLine("🔹 Microsserviço: Payments  → /api/payments");
+Console.WriteLine("═══════════════════════════════════════════════════════");
 
 #endregion
 

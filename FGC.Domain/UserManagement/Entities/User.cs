@@ -1,6 +1,6 @@
-﻿using FGC.Domain.Common.Entities;
-using FGC.Domain.Common.Events;
+using FGC.Domain.Common.Entities;
 using FGC.Domain.UserManagement.Enums;
+using FGC.Domain.UserManagement.Events;
 using FGC.Domain.UserManagement.ValueObjects;
 
 namespace FGC.Domain.UserManagement.Entities
