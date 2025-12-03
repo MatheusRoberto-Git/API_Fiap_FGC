@@ -6,12 +6,18 @@
 > **Tech Challenge - Fase 2**  
 > Evolução da API com CI/CD, Dockerização, Cloud Deployment e Monitoramento para garantir escalabilidade e resiliência.
 
+> **Tech Challenge - Fase 3**  
+> Migração para Microsserviços, integração com Elasticsearch, funções Serverless e API Gateway para eficiência operacional.
+
 ---
 
 ## 📋 Índice
 
 - [🎯 Objetivos](#-objetivos)
 - [🏗️ Arquitetura](#️-arquitetura)
+- [🔷 Microsserviços](#-microsserviços)
+- [🔍 Elasticsearch](#-elasticsearch)
+- [⚡ Serverless](#-serverless)
 - [🚀 Como Executar](#-como-executar)
 - [🔄 CI/CD e Deployment](#-cicd-e-deployment)
 - [📊 Monitoramento](#-monitoramento)
@@ -27,7 +33,7 @@
 ## 🎯 Objetivos
 
 ### Objetivo Geral
-Desenvolver a **plataforma FIAP Cloud Games** com deploy automatizado, containerização e monitoramento em cloud, garantindo escalabilidade, resiliência e observabilidade.
+Desenvolver a **plataforma FIAP Cloud Games** com arquitetura de microsserviços, busca otimizada com Elasticsearch e funções serverless, garantindo escalabilidade, modularidade e eficiência operacional.
 
 ### Objetivos Específicos - Fase 1
 - ✅ **Implementar Clean Architecture** com DDD
@@ -44,6 +50,14 @@ Desenvolver a **plataforma FIAP Cloud Games** com deploy automatizado, container
 - ✅ **Configurar monitoramento** Azure Monitor + Datadog
 - ✅ **Garantir escalabilidade** e alta disponibilidade
 - ✅ **Automatizar testes** e deployment contínuo
+
+### Objetivos Específicos - Fase 3
+- ✅ **Migrar para Microsserviços** - 3 serviços independentes (Users, Games, Payments)
+- ✅ **Implementar Elasticsearch** - Busca e indexação otimizada de jogos
+- ✅ **Criar funções Serverless** - AWS Lambda/Azure Functions para processos assíncronos
+- ✅ **Configurar API Gateway** - Gerenciamento centralizado de requisições
+- ✅ **Implementar Event Sourcing** - Registro de mudanças de estado
+- ✅ **Melhorar Observabilidade** - Logs e rastreamento distribuído (Traces)
 
 ---
 
@@ -63,10 +77,40 @@ Desenvolver a **plataforma FIAP Cloud Games** com deploy automatizado, container
 └─────────────────────────────────────┘
 ```
 
+### Arquitetura de Microsserviços - Fase 3
+
+```
+                                    ┌─────────────────┐
+                                    │   API Gateway   │
+                                    │  (Azure APIM)   │
+                                    └────────┬────────┘
+                                             │
+                    ┌────────────────────────┼────────────────────────┐
+                    │                        │                        │
+                    ▼                        ▼                        ▼
+           ┌───────────────┐        ┌───────────────┐        ┌───────────────┐
+           │    Users      │        │    Games      │        │   Payments    │
+           │ Microservice  │        │ Microservice  │        │ Microservice  │
+           └───────┬───────┘        └───────┬───────┘        └───────┬───────┘
+                   │                        │                        │
+                   ▼                        ▼                        ▼
+           ┌───────────────┐        ┌───────────────┐        ┌───────────────┐
+           │   SQL Server  │        │ Elasticsearch │        │   SQL Server  │
+           │   (Users DB)  │        │  (Games Index)│        │ (Payments DB) │
+           └───────────────┘        └───────────────┘        └───────────────┘
+                                           │
+                                           ▼
+                                    ┌───────────────┐
+                                    │    Azure      │
+                                    │   Functions   │
+                                    │ (Serverless)  │
+                                    └───────────────┘
+```
+
 ### Contextos Delimitados (Bounded Contexts)
 - **👤 User Management**: Cadastro, autenticação e gestão de usuários
-- **🎮 Game Catalog**: Catálogo de jogos (futuro)
-- **📚 Game Library**: Biblioteca de jogos do usuário (futuro)
+- **🎮 Game Catalog**: Catálogo, busca e recomendação de jogos
+- **💳 Payment Processing**: Processamento e status de transações
 - **🎉 Promotion**: Sistema de promoções (futuro)
 
 ### Estrutura de Projetos
@@ -76,11 +120,324 @@ API_Fiap_FGC/
 │   ├── ci.yml              # Continuous Integration
 │   └── cd.yml              # Continuous Deployment
 ├── FGC.Domain/             # Regras de negócio e entidades
+│   ├── UserManagement/     # Contexto de Usuários
+│   ├── GameManagement/     # Contexto de Jogos (Fase 3)
+│   └── PaymentManagement/  # Contexto de Pagamentos (Fase 3)
 ├── FGC.Application/        # Casos de uso e orquestração
 ├── FGC.Infrastructure/     # Acesso a dados e serviços externos
 ├── FGC.Presentation/       # Controllers e modelos de API
 ├── FGC.Domain.Tests/       # Testes unitários com TDD
+├── FGC.Serverless/         # Azure Functions (Fase 3)
 └── Dockerfile              # Imagem Docker multi-stage
+```
+
+---
+
+## 🔷 Microsserviços
+
+### Visão Geral
+
+A aplicação foi dividida em **3 microsserviços principais**, cada um com responsabilidades bem definidas:
+
+| Microsserviço | Responsabilidade | Endpoints Base |
+|---------------|------------------|----------------|
+| **Users** | Cadastro, login, gestão de perfis e administração | `/api/users`, `/api/auth`, `/api/admin` |
+| **Games** | Listagem, busca, recomendação e gestão de jogos | `/api/games` |
+| **Payments** | Processamento, status e histórico de transações | `/api/payments` |
+
+### Microsserviço de Usuários (Users)
+
+**Funcionalidades:**
+- Cadastro de novos usuários
+- Autenticação via JWT
+- Gerenciamento de perfis
+- Administração (promoção/demoção de admins)
+- Ativação/Desativação de contas
+
+**Eventos de Domínio:**
+- `UserCreatedEvent`
+- `UserAuthenticatedEvent`
+- `PasswordChangedEvent`
+- `UserDeactivatedEvent`
+- `UserReactivatedEvent`
+- `UserPromotedToAdminEvent`
+- `AdminUserCreatedEvent`
+
+### Microsserviço de Jogos (Games)
+
+**Funcionalidades:**
+- Listagem de jogos ativos
+- Busca por título (integração Elasticsearch)
+- Busca por categoria
+- Criação de jogos (Admin)
+- Atualização de preços (Admin)
+- Recomendações baseadas em histórico
+- Métricas de jogos populares
+
+**Eventos de Domínio:**
+- `GameCreatedEvent`
+- `GamePriceUpdatedEvent`
+- `GameDeactivatedEvent`
+
+**Categorias Disponíveis:**
+- Action, Adventure, RPG, Strategy, Sports
+- Racing, Simulation, Puzzle, Horror, FPS
+- MMORPG, Indie, Fighting, Platformer, Sandbox
+
+### Microsserviço de Pagamentos (Payments)
+
+**Funcionalidades:**
+- Criação de pagamentos
+- Processamento de transações
+- Consulta de status
+- Histórico por usuário
+- Reembolsos (Admin)
+
+**Estados de Pagamento:**
+```
+Pending → Processing → Completed
+                    ↘ Failed
+Completed → Refunded
+Pending → Cancelled
+```
+
+**Eventos de Domínio:**
+- `PaymentCreatedEvent`
+- `PaymentProcessingEvent`
+- `PaymentCompletedEvent`
+- `PaymentFailedEvent`
+- `PaymentRefundedEvent`
+- `PaymentCancelledEvent`
+
+**Métodos de Pagamento:**
+- CreditCard, DebitCard, Pix
+- BankSlip, PayPal, ApplePay, GooglePay
+
+### Comunicação entre Microsserviços
+
+```
+┌──────────────┐     HTTP/REST      ┌──────────────┐
+│    Users     │◄──────────────────►│    Games     │
+└──────────────┘                    └──────────────┘
+       │                                   │
+       │          ┌──────────────┐         │
+       └─────────►│   Payments   │◄────────┘
+                  └──────────────┘
+                         │
+                         ▼
+                  ┌──────────────┐
+                  │    Events    │
+                  │    (Async)   │
+                  └──────────────┘
+```
+
+---
+
+## 🔍 Elasticsearch
+
+### Implementação
+
+O Elasticsearch foi implementado para otimizar a busca e indexação dos dados de jogos.
+
+### Índice de Jogos
+
+```json
+{
+  "mappings": {
+    "properties": {
+      "id": { "type": "keyword" },
+      "title": { 
+        "type": "text",
+        "analyzer": "standard",
+        "fields": {
+          "keyword": { "type": "keyword" }
+        }
+      },
+      "description": { "type": "text" },
+      "price": { "type": "float" },
+      "category": { "type": "keyword" },
+      "developer": { "type": "keyword" },
+      "publisher": { "type": "keyword" },
+      "releaseDate": { "type": "date" },
+      "rating": { "type": "float" },
+      "totalSales": { "type": "integer" },
+      "isActive": { "type": "boolean" }
+    }
+  }
+}
+```
+
+### Consultas Avançadas
+
+**Busca por Título (Full-Text Search):**
+```json
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "adventure",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+```
+
+**Recomendações por Histórico:**
+```json
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "term": { "category": "RPG" } },
+        { "term": { "developer": "CD Projekt" } }
+      ],
+      "must_not": [
+        { "terms": { "id": ["jogos-já-comprados"] } }
+      ]
+    }
+  }
+}
+```
+
+**Agregações - Jogos Mais Populares:**
+```json
+{
+  "aggs": {
+    "top_categories": {
+      "terms": { "field": "category", "size": 10 }
+    },
+    "avg_rating_by_category": {
+      "terms": { "field": "category" },
+      "aggs": {
+        "avg_rating": { "avg": { "field": "rating" } }
+      }
+    },
+    "most_sold": {
+      "top_hits": {
+        "sort": [{ "totalSales": "desc" }],
+        "size": 10
+      }
+    }
+  }
+}
+```
+
+### Endpoints de Busca
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/games/search?term=xxx` | Busca full-text por título |
+| GET | `/api/games/category/{category}` | Filtro por categoria |
+| GET | `/api/games/recommendations/{userId}` | Recomendações personalizadas |
+| GET | `/api/games/popular` | Jogos mais vendidos |
+| GET | `/api/games/top-rated` | Jogos melhor avaliados |
+
+---
+
+## ⚡ Serverless
+
+### Azure Functions Implementadas
+
+As funções serverless foram criadas para processos assíncronos, garantindo escalabilidade e eficiência.
+
+### 1. ProcessPaymentFunction
+
+**Trigger:** HTTP / Queue  
+**Descrição:** Processa pagamentos de forma assíncrona
+
+```csharp
+[FunctionName("ProcessPayment")]
+public async Task<IActionResult> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req,
+    [Queue("payment-processed")] IAsyncCollector<string> outputQueue)
+{
+    // Processa pagamento
+    // Envia para fila de confirmação
+}
+```
+
+### 2. SendNotificationFunction
+
+**Trigger:** Queue (payment-processed)  
+**Descrição:** Envia notificações após eventos
+
+```csharp
+[FunctionName("SendNotification")]
+public async Task Run(
+    [QueueTrigger("payment-processed")] string message,
+    [SendGrid] IAsyncCollector<SendGridMessage> emails)
+{
+    // Envia email de confirmação
+}
+```
+
+### 3. SyncElasticsearchFunction
+
+**Trigger:** Timer (a cada 5 minutos) / Event  
+**Descrição:** Sincroniza dados de jogos com Elasticsearch
+
+```csharp
+[FunctionName("SyncElasticsearch")]
+public async Task Run(
+    [TimerTrigger("0 */5 * * * *")] TimerInfo timer)
+{
+    // Sincroniza jogos novos/atualizados
+}
+```
+
+### 4. GameRecommendationFunction
+
+**Trigger:** HTTP  
+**Descrição:** Gera recomendações personalizadas
+
+```csharp
+[FunctionName("GetRecommendations")]
+public async Task<IActionResult> Run(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+{
+    // Consulta Elasticsearch
+    // Retorna recomendações
+}
+```
+
+### Configuração de Triggers
+
+| Função | Trigger | Configuração |
+|--------|---------|--------------|
+| ProcessPayment | HTTP + Queue | POST `/api/process-payment` |
+| SendNotification | Queue | `payment-processed` queue |
+| SyncElasticsearch | Timer | `0 */5 * * * *` (cada 5 min) |
+| GameRecommendation | HTTP | GET `/api/recommendations` |
+
+### API Gateway (Azure API Management)
+
+**Funcionalidades:**
+- Roteamento centralizado para microsserviços
+- Rate limiting (proteção contra sobrecarga)
+- Autenticação JWT centralizada
+- Cache de responses
+- Logging e analytics
+
+**Configuração de Rotas:**
+
+```yaml
+apis:
+  - name: users-api
+    path: /api/users/*
+    backend: https://fgc-users.azurewebsites.net
+    
+  - name: games-api
+    path: /api/games/*
+    backend: https://fgc-games.azurewebsites.net
+    
+  - name: payments-api
+    path: /api/payments/*
+    backend: https://fgc-payments.azurewebsites.net
+    
+  - name: serverless-api
+    path: /api/functions/*
+    backend: https://fgc-functions.azurewebsites.net
 ```
 
 ---
@@ -91,6 +448,7 @@ API_Fiap_FGC/
 - **.NET 8 SDK** ou superior
 - **Docker Desktop** (para containerização)
 - **Azure CLI** (para deploy na cloud)
+- **Elasticsearch** (local ou cloud)
 - **IDE**: Visual Studio 2022 ou VS Code
 - **Git** para clonagem do repositório
 
@@ -123,11 +481,26 @@ docker run -d -p 8080:8080 \
   -e ASPNETCORE_ENVIRONMENT=Development \
   -e ConnectionStrings__DefaultConnection="SuaConnectionString" \
   -e Jwt__SecretKey="SuaChaveSecreta" \
+  -e Elasticsearch__Url="http://localhost:9200" \
   --name fgc-api-local \
   fgc-api:local
 
 # Testar
 curl http://localhost:8080/health
+```
+
+### Executar Elasticsearch Local
+
+```bash
+# Com Docker
+docker run -d --name elasticsearch \
+  -p 9200:9200 -p 9300:9300 \
+  -e "discovery.type=single-node" \
+  -e "xpack.security.enabled=false" \
+  elasticsearch:8.11.0
+
+# Verificar
+curl http://localhost:9200
 ```
 
 ### Acessar em Produção
@@ -165,6 +538,7 @@ A aplicação está publicada na Azure e pode ser acessada em:
 - ✅ Build da imagem Docker
 - ✅ Push para Azure Container Registry
 - ✅ Deploy no Azure Container Instance
+- ✅ Deploy das Azure Functions
 - ✅ Health check automático
 - ✅ Notificação de deployment no Datadog
 
@@ -176,7 +550,9 @@ A aplicação está publicada na Azure e pode ser acessada em:
 - **Azure Container Registry** (`fgcregistry`) - Armazenamento de imagens Docker
 - **Azure Container Instance** (`fgc-api-container`) - Hosting da aplicação
 - **Azure SQL Database** (`fgc-database`) - Banco de dados
-- **SQL Server** (`fgc-sql-server`) - Servidor de banco
+- **Azure Functions** (`fgc-functions`) - Funções serverless
+- **Azure API Management** - API Gateway
+- **Elasticsearch Service** - Busca e indexação
 - **Resource Group** (`rg-fgc-api`) - Agrupamento de recursos
 
 ### Docker
@@ -227,11 +603,24 @@ az monitor metrics list --resource fgc-api-container
 - ✅ Status de CI/CD
 - 📦 Versões deployadas
 - ⏱️ Tempo de deployment
+- 🔍 Traces distribuídos
 
 **Configuração:**
 - Service: `fgc-api`
 - Environment: `production`
 - Site: `datadoghq.com`
+
+### Rastreamento Distribuído (Traces)
+
+Com a arquitetura de microsserviços, implementamos tracing distribuído para acompanhar requisições entre serviços:
+
+```
+[API Gateway] → [Users Service] → [Database]
+                      ↓
+              [Payments Service] → [Queue] → [Function]
+                      ↓
+               [Games Service] → [Elasticsearch]
+```
 
 ### Health Checks
 
@@ -265,6 +654,13 @@ GET  /api/users/profile/{id}  # Obter perfil do usuário
 PUT  /api/users/changePassword/{id} # Alterar senha
 ```
 
+#### Jogos
+```http
+GET  /api/games               # Listar todos os jogos ativos
+GET  /api/games/{id}          # Buscar jogo por ID
+GET  /api/games/search?term=xxx # Buscar jogos por título
+```
+
 ### 🔐 Endpoints Protegidos (JWT Required)
 
 #### Administração (Role: Admin)
@@ -277,6 +673,22 @@ PUT  /api/admin/reactivate/{id}  # Reativar usuário
 GET  /api/admin/adminLogged      # Informações do admin logado
 ```
 
+#### Jogos - Admin
+```http
+POST /api/games                  # Criar novo jogo
+PUT  /api/games/{id}/price       # Atualizar preço do jogo
+```
+
+#### Pagamentos
+```http
+POST /api/payments               # Criar pagamento
+GET  /api/payments/{id}          # Buscar pagamento por ID
+GET  /api/payments/{id}/status   # Consultar status do pagamento
+GET  /api/payments/user/{userId} # Listar pagamentos do usuário
+POST /api/payments/{id}/process  # Processar pagamento pendente
+POST /api/payments/{id}/refund   # Solicitar reembolso (Admin)
+```
+
 ---
 
 ## 🔐 Autenticação JWT
@@ -285,7 +697,7 @@ GET  /api/admin/adminLogged      # Informações do admin logado
 
 #### 1. Registrar Usuário
 ```bash
-curl -X POST http://fgc-api-v1.h2f6dpcqhbdzc5df.eastus2.azurecontainer.io:8080/api/users/register \
+curl -X POST http://fgc-api-v1.eastus2.azurecontainer.io:8080/api/users/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "usuario@fgc.com",
@@ -296,7 +708,7 @@ curl -X POST http://fgc-api-v1.h2f6dpcqhbdzc5df.eastus2.azurecontainer.io:8080/a
 
 #### 2. Fazer Login
 ```bash
-curl -X POST http://fgc-api-v1.h2f6dpcqhbdzc5df.eastus2.azurecontainer.io:8080/api/auth/login \
+curl -X POST http://fgc-api-v1.eastus2.azurecontainer.io:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "usuario@fgc.com",
@@ -334,9 +746,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 4. Agora pode acessar endpoints protegidos
 
 ### Níveis de Acesso
-- **🟢 Público**: Registro, login, visualizar perfis
-- **🔵 Usuário**: Alterar própria senha, acessar biblioteca (futuro)
-- **🔴 Admin**: Gerenciar usuários, criar admins, acessar relatórios
+- **🟢 Público**: Registro, login, visualizar jogos
+- **🔵 Usuário**: Comprar jogos, ver pagamentos, alterar senha
+- **🔴 Admin**: Gerenciar usuários, criar jogos, processar reembolsos
 
 ---
 
@@ -446,17 +858,40 @@ dotnet test --verbosity detailed
     ↓
 [Política] Validar: Dados do jogo
     ↓
-[Política] Save: SQL Server
+[Política] Save: SQL Server + Elasticsearch
     ↓
 [Evento] Jogo Cadastrado
     ↓
 [Modelo Leitura] Catálogo de jogos
 ```
 
+#### 💳 Fluxo de Compra de Jogo (Fase 3)
+```
+[Comando] Comprar Jogo
+    ↓
+[Política] Validar: Usuário autenticado
+    ↓
+[Política] Validar: Jogo disponível
+    ↓
+[Comando] Criar Pagamento
+    ↓
+[Evento] Pagamento Criado
+    ↓
+[Trigger] Azure Function: ProcessPayment
+    ↓
+[Política] Processar: Gateway de Pagamento
+    ↓
+[Evento] Pagamento Completado / Falhou
+    ↓
+[Trigger] Azure Function: SendNotification
+    ↓
+[Política] Enviar: Email de confirmação
+```
+
 ### Contextos Identificados
 - **User Management**: Usuários, autenticação, perfis
-- **Game Catalog**: Jogos, preços, categorias
-- **Game Library**: Biblioteca pessoal, downloads
+- **Game Catalog**: Jogos, preços, categorias, busca
+- **Payment Processing**: Transações, status, reembolsos
 - **Promotion**: Descontos, ofertas especiais
 
 ---
@@ -474,13 +909,20 @@ dotnet test --verbosity detailed
 - **Azure Container Registry**: Registry Docker
 - **Azure Container Instances**: Hosting
 - **Azure SQL Database**: Banco de dados
+- **Azure Functions**: Serverless
+- **Azure API Management**: API Gateway
 - **GitHub Actions**: CI/CD
 - **Docker**: Containerização
+
+### Busca e Indexação
+- **Elasticsearch**: Busca full-text e agregações
+- **NEST**: Cliente .NET para Elasticsearch
 
 ### Monitoramento
 - **Azure Monitor**: Logs e métricas nativas
 - **Datadog**: APM e eventos de deployment
 - **Container Insights**: Telemetria de containers
+- **Application Insights**: Traces distribuídos
 
 ### Banco de Dados
 - **SQL Server**: Produção
@@ -493,8 +935,9 @@ dotnet test --verbosity detailed
 ### Arquitetura
 - **Clean Architecture**: Separação de responsabilidades
 - **Domain-Driven Design**: Modelagem do domínio
-- **CQRS**: Command Query Responsibility Segregation
+- **Microsserviços**: Serviços independentes
 - **Event Sourcing**: Eventos de domínio
+- **CQRS**: Command Query Responsibility Segregation
 
 ---
 
@@ -507,7 +950,7 @@ dotnet test --verbosity detailed
 
 ### Papéis Técnicos
 - **Solution Architect**: Desenho da arquitetura DDD e Clean Architecture
-- **Backend Developer**: Implementação da API REST
+- **Backend Developer**: Implementação da API REST e Microsserviços
 - **DevOps Engineer**: CI/CD e infraestrutura na cloud
 - **QA Engineer**: Implementação de testes TDD
 
@@ -552,6 +995,14 @@ Este projeto foi desenvolvido como parte do **Tech Challenge - FIAP** e é desti
 - ✅ CI/CD (GitHub Actions com pipelines automatizados)
 - ✅ Deploy na cloud (Azure)
 - ✅ Monitoramento (Azure Monitor + Datadog)
+
+### Fase 3
+- ✅ **Microsserviços** - 3 serviços: Users, Games, Payments
+- ✅ **Elasticsearch** - Indexação e busca avançada de jogos
+- ✅ **Serverless** - Azure Functions para processos assíncronos
+- ✅ **API Gateway** - Gerenciamento centralizado de requisições
+- ✅ **Event Sourcing** - Registro de todas as mudanças de estado
+- ✅ **Observabilidade** - Logs e rastreamento distribuído
 
 ---
 

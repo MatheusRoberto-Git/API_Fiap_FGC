@@ -1,4 +1,6 @@
-﻿using FGC.Domain.UserManagement.Entities;
+using FGC.Domain.GameManagement.Entities;
+using FGC.Domain.PaymentManagement.Entities;
+using FGC.Domain.UserManagement.Entities;
 using FGC.Infrastructure.Data.Configurations;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +13,18 @@ namespace FGC.Infrastructure.Data.Context
         public FGCDbContext() : base() { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Game> Games { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Apply configurations
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new GameConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentConfiguration());
+
             ConfigureGlobalSettings(modelBuilder);
         }
 

@@ -10,17 +10,14 @@
     <Compile Remove="Common\Interfaces\**" />
     <Compile Remove="GameLibrary\**" />
     <Compile Remove="Promotion\**" />
-    <Compile Remove="UserManagement\Events\**" />
     <Compile Remove="UserManagement\Exceptions\**" />
     <EmbeddedResource Remove="Common\Interfaces\**" />
     <EmbeddedResource Remove="GameLibrary\**" />
     <EmbeddedResource Remove="Promotion\**" />
-    <EmbeddedResource Remove="UserManagement\Events\**" />
     <EmbeddedResource Remove="UserManagement\Exceptions\**" />
     <None Remove="Common\Interfaces\**" />
     <None Remove="GameLibrary\**" />
     <None Remove="Promotion\**" />
-    <None Remove="UserManagement\Events\**" />
     <None Remove="UserManagement\Exceptions\**" />
   </ItemGroup>
 
